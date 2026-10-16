@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculadora de testes diagnósticos</title>
+<style>
+:root{--ink:#182230;--muted:#5b6778;--line:#dbe2ea;--paper:#f5f7fa;--blue:#2458a6;--green:#16834a;--red:#c83f3f;--softblue:#eaf1fb}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1180px;margin:auto;padding:28px 18px 48px}.hero{margin-bottom:22px}.eyebrow{text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:750;color:var(--blue)}h1{font-size:clamp(27px,4vw,38px);line-height:1.15;margin:6px 0 10px;letter-spacing:-.03em}.sub{max-width:800px;color:var(--muted);margin:0}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.panel,.result-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 3px 12px #18223008}.panel h2{font-size:17px;margin:0 0 5px}.hint{font-size:13px;color:var(--muted);margin:0 0 15px}.field{margin:11px 0}.field label{display:block;font-size:13px;font-weight:650;margin-bottom:5px}.field input{width:100%;border:1px solid #c8d1dd;border-radius:9px;padding:10px 11px;font:inherit;background:#fff;color:var(--ink)}.field input:focus{outline:3px solid #2458a622;border-color:var(--blue)}.unit{font-size:12px;color:var(--muted);font-weight:450}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:8px 6px;text-align:center;border-bottom:1px solid var(--line)}th{background:#f4f7fb;font-weight:650}td:first-child,th:first-child{text-align:left}.table-wrap input{min-width:60px;width:100%;padding:7px;border:1px solid #c8d1dd;border-radius:7px;font:inherit;text-align:center}.table-note{font-size:12px;color:var(--muted);margin-top:8px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0}.btn{border:0;border-radius:10px;padding:12px 20px;font:inherit;font-weight:750;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:white;border:1px solid var(--line);color:var(--ink)}.status{font-size:13px;color:var(--muted)}.error{display:none;background:#fff0f0;border:1px solid #f0b8b8;color:#8f2020;border-radius:10px;padding:11px 14px;margin:12px 0}.results{display:none}.section-title{font-size:23px;letter-spacing:-.02em;margin:28px 0 12px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{border:1px solid var(--line);border-radius:12px;padding:14px;background:white}.metric .k{font-size:12px;color:var(--muted);min-height:36px}.metric .v{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-top:3px;overflow-wrap:anywhere}.metric .detail{font-size:12px;color:var(--muted);margin-top:3px}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.result-panel h3{font-size:17px;margin:0 0 12px}.table-result td:first-child{text-align:left}.table-result td:last-child{text-align:right;font-variant-numeric:tabular-nums}.fagan-wrap{width:100%;overflow:auto}.fagan-wrap svg{width:100%;min-width:560px;height:auto;display:block}.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:8px 0}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}.notice{background:#f4f7fb;border-radius:10px;padding:11px 13px;font-size:13px;color:var(--muted);margin-top:12px}.foot{color:var(--muted);font-size:12px;margin-top:22px}.tag{display:inline-block;border-radius:6px;background:var(--softblue);color:var(--blue);font-size:11px;font-weight:750;padding:3px 7px;margin-bottom:7px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.twocol{grid-template-columns:1fr}}@media(max-width:420px){main{padding:20px 12px}.metrics{grid-template-columns:1fr 1fr}.metric{padding:10px}.metric .v{font-size:20px}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+<div class="eyebrow">Epidemiologia clínica · ferramenta educacional</div>
+<h1>Calculadora de testes diagnósticos</h1>
+<p class="sub">Preencha <b>um</b> dos três conjuntos de dados e clique em “Calcular”. Os outros campos, os indicadores diagnósticos e o nomograma de Fagan serão atualizados automaticamente.</p>
+</header>
+<div class="grid">
+<section class="panel">
+<div class="tag">ENTRADA 1</div><h2>Tabela de contingência</h2>
+<p class="hint">Informe contagens inteiras e não negativas. Os valores devem formar uma tabela completa.</p>
+<div class="table-wrap"><table>
+<thead><tr><th></th><th>Doença +</th><th>Doença −</th></tr></thead>
+<tbody>
+<tr><th>Teste +</th><td><input id="vp" type="number" min="0" step="1" placeholder="VP"></td><td><input id="fp" type="number" min="0" step="1" placeholder="FP"></td></tr>
+<tr><th>Teste −</th><td><input id="fn" type="number" min="0" step="1" placeholder="FN"></td><td><input id="vn" type="number" min="0" step="1" placeholder="VN"></td></tr>
+</tbody></table></div>
+<div class="table-note">VP: verdadeiro positivo · FP: falso positivo · FN: falso negativo · VN: verdadeiro negativo.</div>
+</section>
+<section class="panel">
+<div class="tag">ENTRADA 2</div><h2>Prevalência, sensibilidade e especificidade</h2>
+<p class="hint">Informe probabilidades como percentuais de 0 a 100.</p>
+<div class="field"><label for="prev2">Prevalência / probabilidade pré-teste <span class="unit">(%)</span></label><input id="prev2" type="number" min="0" max="100" step="any" placeholder="Ex.: 20"></div>
+<div class="field"><label for="se2">Sensibilidade <span class="unit">(%)</span></label><input id="se2" type="number" min="0" max="100" step="any" placeholder="Ex.: 90"></div>
+<div class="field"><label for="sp2">Especificidade <span class="unit">(%)</span></label><input id="sp2" type="number" min="0" max="100" step="any" placeholder="Ex.: 85"></div>
+</section>
+<section class="panel">
+<div class="tag">ENTRADA 3</div><h2>Prevalência e razões de verossimilhança</h2>
+<p class="hint">A RV+ deve ser maior que a RV− para um teste informativo na direção habitual.</p>
+<div class="field"><label for="prev3">Prevalência / probabilidade pré-teste <span class="unit">(%)</span></label><input id="prev3" type="number" min="0" max="100" step="any" placeholder="Ex.: 20"></div>
+<div class="field"><label for="lrp">Razão de verossimilhança positiva (RV+)</label><input id="lrp" type="number" min="0" step="any" placeholder="Ex.: 6"></div>
+<div class="field"><label for="lrn">Razão de verossimilhança negativa (RV−)</label><input id="lrn" type="number" min="0" step="any" placeholder="Ex.: 0,12"></div>
+</section>
+</div>
+<div class="actions"><button class="btn primary" id="calculate">Calcular</button><button class="btn secondary" id="reset">Limpar campos</button><span class="status" id="status">Selecione um conjunto de entrada para começar.</span></div>
+<div class="error" id="error" role="alert"></div>
+<div class="results" id="results">
+<h2 class="section-title">Resultados</h2>
+<div class="metrics" id="metrics"></div>
+<div class="twocol">
+<section class="result-panel"><h3>Tabela de contingência resultante</h3><div class="table-wrap"><table class="table-result" id="resultTable"></table></div><div class="notice" id="cohortNote"></div></section>
+<section class="result-panel"><h3>Parâmetros do teste</h3><div class="table-wrap"><table class="table-result" id="paramTable"></table></div><div class="notice">Odds são calculadas como p/(1 − p). A probabilidade pós-teste é odds pós-teste/(1 + odds pós-teste).</div></section>
+</div>
+<h2 class="section-title">Nomograma de Fagan</h2>
+<section class="result-panel">
+<div class="legend"><span><i class="dot" style="background:#16834a"></i>Teste positivo (RV+)</span><span><i class="dot" style="background:#c83f3f"></i>Teste negativo (RV−)</span><span><i class="dot" style="background:#667085"></i>Probabilidade pré-teste</span></div>
+<div class="fagan-wrap" id="fagan"></div>
+<div class="notice" id="faganNote"></div>
+</section>
+<p class="foot">Ferramenta educacional; não substitui avaliação clínica. Contagens derivadas de uma coorte hipotética de 1.000 pessoas podem ser fracionárias, pois representam valores esperados. Em prevalência de 0% ou 100%, alguns odds e razões de verossimilhança podem ser indefinidos; nesses casos, os resultados correspondentes são exibidos como não definidos.</p>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const ids=['vp','fp','fn','vn','prev2','se2','sp2','prev3','lrp','lrn'];
+const fmtP=x=>Number.isFinite(x)?(x*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%':'Não definido';
+const fmtN=x=>Number.isFinite(x)?x.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'Não definido';
+const fmtOdds=x=>Number.isFinite(x)?x.toLocaleString('pt-BR',{maximumFractionDigits:4}):(x===Infinity?'∞':'Não definido');
+const val=id=>{const s=$(id).value.trim();return s===''?NaN:Number(s.replace(',','.'))};
+function fail(msg){$('error').textContent=msg;$('error').style.display='block';$('results').style.display='none';$('status').textContent='Revise os dados de entrada.'}
+function clearError(){$('error').style.display='none'}
+let activeSource=null;
+const sourceGroups=[['vp','fp','fn','vn'],['prev2','se2','sp2'],['prev3','lrp','lrn']];
+sourceGroups.forEach((group,index)=>group.forEach(id=>$(id).addEventListener('input',()=>{activeSource=index;})));
+function inputMode(){
+ const filled=sourceGroups.map(g=>g.filter(id=>$(id).value.trim()!=='').length);
+ const complete=filled.map((n,i)=>n===sourceGroups[i].length);
+ const any=filled.some(n=>n>0);
+ if(!any)return {error:'Preencha um dos três conjuntos de entrada.'};
+ if(activeSource!==null){
+   if(!complete[activeSource])return {error:'Complete os campos do conjunto que você começou a editar.'};
+   return {mode:activeSource};
+ }
+ if(complete.filter(Boolean).length!==1)return {error:'Preencha todos os campos de apenas um conjunto de entrada e deixe os outros dois em branco.'};
+ return {mode:complete.findIndex(Boolean)};
+}
+function calculate(){
+ clearError();const pick=inputMode();if(pick.error)return fail(pick.error);
+ let p,se,sp,lrp,lrn,table=null,source=pick.mode;
+ if(source===0){
+  let vp=val('vp'),fp=val('fp'),fn=val('fn'),vn=val('vn');
+  if([vp,fp,fn,vn].some(x=>!Number.isFinite(x)||x<0||!Number.isInteger(x)))return fail('Na tabela, informe quatro números inteiros não negativos.');
+  const n=vp+fp+fn+vn;if(n<=0)return fail('A soma das quatro células deve ser maior que zero.');
+  if(vp+fn===0||vn+fp===0)return fail('A tabela precisa conter ao menos uma pessoa com doença e uma sem doença para estimar sensibilidade e especificidade.');
+  if(vp+fp===0||fn+vn===0)return fail('A tabela precisa conter ao menos um teste positivo e um teste negativo para estimar os valores preditivos.');
+  p=(vp+fn)/n;se=vp/(vp+fn);sp=vn/(vn+fp);table={vp,fp,fn,vn,n,synthetic:false};
+ }else if(source===1){
+  p=val('prev2')/100;se=val('se2')/100;sp=val('sp2')/100;
+  if([p,se,sp].some(x=>!Number.isFinite(x)||x<0||x>1))return fail('Prevalência, sensibilidade e especificidade devem estar entre 0% e 100%.');
+ }else{
+  p=val('prev3')/100;lrp=val('lrp');lrn=val('lrn');
+  if(!Number.isFinite(p)||p<0||p>1)return fail('A prevalência deve estar entre 0% e 100%.');
+  if(!Number.isFinite(lrp)||!Number.isFinite(lrn)||lrp<0||lrn<0)return fail('As razões de verossimilhança devem ser números não negativos.');
+  if(!(lrp>lrn))return fail('Para reconstruir sensibilidade e especificidade, a RV+ deve ser maior que a RV−.');
+  const d=lrp-lrn;se=lrp*(1-lrn)/d;sp=(1-lrn)/d;
+  const eps=1e-10;if(se < -eps||se>1+eps||sp < -eps||sp>1+eps)return fail('Esta combinação de RV+ e RV− não corresponde a sensibilidade e especificidade válidas entre 0% e 100%. Verifique os valores.');
+  se=Math.min(1,Math.max(0,se));sp=Math.min(1,Math.max(0,sp));
+ }
+ if(source!==0){
+  // Expected counts in a hypothetical cohort of 1,000; fractions are expected values.
+  const n=1000,diseased=n*p,healthy=n*(1-p),vp=diseased*se,fn=diseased*(1-se),vn=healthy*sp,fp=healthy*(1-sp);
+  table={vp,fp,fn,vn,n,synthetic:true};
+ }
+ // Compute likelihood ratios, allowing infinities for perfect tests where mathematically defined.
+ lrp=(1-sp)===0?(se===0?NaN:Infinity):se/(1-sp);
+ lrn=sp===0?(se===1?NaN:Infinity):(1-se)/sp;
+ const oddsPre=p===1?Infinity:(p===0?0:p/(1-p));
+ const postP=lr=>{if(p===0)return 0;if(p===1)return 1;if(lr===Infinity)return 1;if(lr===0)return 0;if(!Number.isFinite(lr))return NaN;const o=oddsPre*lr;return o/(1+o)};
+ const pp=postP(lrp),pn=postP(lrn);
+ const vp=table.vp,fp=table.fp,fn=table.fn,vn=table.vn,n=table.n;
+ const vpp=(vp+fp)>0?vp/(vp+fp):NaN,vpn=(vn+fn)>0?vn/(vn+fn):NaN,acc=(vp+vn)/n;
+ const nnd=(se-(1-sp))>0?1/(se-(1-sp)):Infinity;
+ const oddsPostP=pp===1?Infinity:(pp===0?0:pp/(1-pp));
+ const oddsPostN=pn===1?Infinity:(pn===0?0:pn/(1-pn));
+ // Write the other two parameter sets, leaving the selected source untouched.
+ if(source!==0){$('vp').value=roundCell(vp);$('fp').value=roundCell(fp);$('fn').value=roundCell(fn);$('vn').value=roundCell(vn);}
+ if(source!==1){$('prev2').value=displayInput(p*100);$('se2').value=displayInput(se*100);$('sp2').value=displayInput(sp*100);}
+ if(source!==2){$('prev3').value=displayInput(p*100);$('lrp').value=displayInput(lrp);$('lrn').value=displayInput(lrn);}
+ const metrics=[
+  ['Odds pré-teste',fmtOdds(oddsPre),'p / (1 − p)'],
+  ['Probabilidade pré-teste (prevalência)',fmtP(p),'Probabilidade de doença antes do teste'],
+  ['Sensibilidade',fmtP(se),'VP / (VP + FN)'],
+  ['Especificidade',fmtP(sp),'VN / (VN + FP)'],
+  ['Eficiência/acurácia',fmtP(acc),'(VP + VN) / total'],
+  ['NND',fmtN(nnd),'1 / [sensibilidade − (1 − especificidade)]'],
+  ['Odds pós-teste positivo',fmtOdds(oddsPostP),'Odds pré-teste × RV+'],
+  ['Probabilidade pós-teste positivo',fmtP(pp),'Após resultado positivo'],
+  ['Odds pós-teste negativo',fmtOdds(oddsPostN),'Odds pré-teste × RV−'],
+  ['Probabilidade pós-teste negativo',fmtP(pn),'Após resultado negativo'],
+  ['Valor preditivo negativo',fmtP(vpn),'P(sem doença | teste −)'],
+  ['Valor preditivo positivo',fmtP(vpp),'P(doença | teste +)']
+  ];
+$('metrics').innerHTML=metrics.map(m=>`<div class="metric"><div class="k">${m[0]}</div><div class="v">${m[1]}</div><div class="detail">${m[2]}</div></div>`).join('');
+ $('resultTable').innerHTML=`<thead><tr><th></th><th>Doença +</th><th>Doença −</th><th>Total</th></tr></thead><tbody><tr><th>Teste +</th><td>${fmtN(vp)}</td><td>${fmtN(fp)}</td><td>${fmtN(vp+fp)}</td></tr><tr><th>Teste −</th><td>${fmtN(fn)}</td><td>${fmtN(vn)}</td><td>${fmtN(fn+vn)}</td></tr><tr><th>Total</th><td>${fmtN(vp+fn)}</td><td>${fmtN(fp+vn)}</td><td>${fmtN(n)}</td></tr></tbody>`;
+ $('cohortNote').textContent=table.synthetic?'Tabela reconstruída como valores esperados em uma coorte hipotética de 1.000 pessoas; por isso, as células podem conter casas decimais.':'Tabela baseada nas contagens fornecidas pelo usuário (n = '+fmtN(n)+').';
+ $('paramTable').innerHTML=`<tbody><tr><td>Probabilidade pré-teste</td><td>${fmtP(p)}</td></tr><tr><td>Sensibilidade</td><td>${fmtP(se)}</td></tr><tr><td>Especificidade</td><td>${fmtP(sp)}</td></tr><tr><td>RV+</td><td>${fmtOdds(lrp)}</td></tr><tr><td>RV−</td><td>${fmtOdds(lrn)}</td></tr><tr><td>Taxa de falso positivo</td><td>${fmtP(1-sp)}</td></tr><tr><td>Taxa de falso negativo</td><td>${fmtP(1-se)}</td></tr></tbody>`;
+ drawFagan(p,lrp,lrn,pp,pn);
+ $('results').style.display='block';$('status').textContent='Cálculo concluído. Entrada usada: '+['tabela de contingência','prevalência, sensibilidade e especificidade','prevalência e razões de verossimilhança'][source]+'.';
+ $('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function roundCell(x){return Number.isFinite(x)?String(Number(x.toFixed(6))):''}
+function displayInput(x){return Number.isFinite(x)?String(Number(x.toPrecision(8))):''}
+function drawFagan(p,lrp,lrn,pp,pn){
+ // Three vertical axes; center LR axis is logarithmic. Endpoints connect the pre-test probability to each post-test probability via the corresponding LR.
+ const W=760,H=440,top=48,bottom=365, xs=[125,380,635], logMin=-3,logMax=3;
+ const yProb=q=>bottom-(Math.log10(Math.max(.001,Math.min(.999,q))/(1-Math.max(.001,Math.min(.999,q)))+1e-14)+3)/6*(bottom-top);
+ // probability scale maps odds 0.001 to 1000, same range on both outside axes
+ const yOdds=o=>bottom-(Math.log10(Math.max(.001,Math.min(1000,o))+1e-14)-logMin)/(logMax-logMin)*(bottom-top);
+ const probToY=q=>yOdds(q<=0?.001:q>=1?1000:q/(1-q));
+ const lrToY=lr=>Number.isFinite(lr)&&lr>0?yOdds(lr):lr===Infinity?top:bottom;
+ const ticks=[.001,.01,.05,.1,.2,.3,.5,.7,.9,.95,.99,.999];
+ const pLabel=q=>q<.01?(q*100).toLocaleString('pt-BR',{maximumFractionDigits:2})+'%':(q*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';
+ let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Nomograma de Fagan com probabilidade pré-teste, razão de verossimilhança e probabilidade pós-teste"><rect x="0" y="0" width="${W}" height="${H}" rx="12" fill="#fff"/>`;
+ // axis labels and lines
+ xs.forEach((x,i)=>{svg+=`<line x1="${x}" y1="${top}" x2="${x}" y2="${bottom}" stroke="#657184" stroke-width="2"/><text x="${x}" y="25" text-anchor="middle" font-size="14" font-weight="700" fill="#182230">${['Probabilidade pré-teste','Razão de verossimilhança','Probabilidade pós-teste'][i]}</text>`});
+ ticks.forEach(q=>{const y=probToY(q);if(y>=top&&y<=bottom){svg+=`<line x1="${xs[0]-5}" y1="${y}" x2="${xs[0]+5}" y2="${y}" stroke="#657184"/><text x="${xs[0]-10}" y="${y+4}" text-anchor="end" font-size="10" fill="#5b6778">${pLabel(q)}</text><line x1="${xs[2]-5}" y1="${y}" x2="${xs[2]+5}" y2="${y}" stroke="#657184"/><text x="${xs[2]+10}" y="${y+4}" text-anchor="start" font-size="10" fill="#5b6778">${pLabel(q)}</text>`}});
+ // Eixo central apenas ilustrativo: sem marcas ou valores de escala.
+ // As linhas retas ligam diretamente os valores pré e pós-teste e cruzam
+ // o eixo central na posição geométrica correspondente aos resultados calculados.
+ const y0=probToY(p),yP=probToY(pp),yN=probToY(pn),yLp=lrToY(lrp),yLn=lrToY(lrn);
+ // Connector lines represent the classic straight-line nomogram relation in log-odds space.
+ svg+=`<line x1="${xs[0]}" y1="${y0}" x2="${xs[2]}" y2="${yP}" stroke="#16834a" stroke-width="3.5" stroke-linecap="round"/><line x1="${xs[0]}" y1="${y0}" x2="${xs[2]}" y2="${yN}" stroke="#c83f3f" stroke-width="3.5" stroke-linecap="round"/>`;
+ svg+=`<circle cx="${xs[0]}" cy="${y0}" r="5" fill="#667085" stroke="white" stroke-width="1.5"/><circle cx="${xs[2]}" cy="${yP}" r="5" fill="#16834a" stroke="white" stroke-width="1.5"/><circle cx="${xs[2]}" cy="${yN}" r="5" fill="#c83f3f" stroke="white" stroke-width="1.5"/>`;
+ // Draw LR points with labels; dashed guides make each LR visible on central scale.
+ // Não desenhar marcadores nem rótulos numéricos de RV no eixo central.
+ svg+=`<text x="${xs[0]}" y="${Math.max(top+14,Math.min(bottom-8,y0-12))}" text-anchor="middle" font-size="11" font-weight="700" fill="#667085">${pLabel(p)}</text><text x="${xs[2]+16}" y="${Math.max(top+12,Math.min(bottom-6,yP-8))}" font-size="11" font-weight="700" fill="#16834a">${pLabel(pp)}</text><text x="${xs[2]+16}" y="${Math.max(top+12,Math.min(bottom-6,yN+15))}" font-size="11" font-weight="700" fill="#c83f3f">${pLabel(pn)}</text>`;
+ svg+=`<text x="${W/2}" y="410" text-anchor="middle" font-size="11" fill="#5b6778">Escala logarítmica de odds · limites visuais de 0,1% a 99,9%</text></svg>`;
+ $('fagan').innerHTML=svg;
+ $('faganNote').textContent=`Pré-teste: ${fmtP(p)}. Após teste positivo (RV+ ${fmtOdds(lrp)}): ${fmtP(pp)}. Após teste negativo (RV− ${fmtOdds(lrn)}): ${fmtP(pn)}. Valores extremos são limitados visualmente ao intervalo de 0,1% a 99,9% no desenho.`;
+}
+$('calculate').addEventListener('click',calculate);
+$('reset').addEventListener('click',()=>{activeSource=null;ids.forEach(id=>$(id).value='');$('results').style.display='none';$('error').style.display='none';$('status').textContent='Selecione um conjunto de entrada para começar.';window.scrollTo({top:0,behavior:'smooth'})});
+// Do not let users accidentally populate multiple source groups without being told; calculate validates the selection.
+</script>
+</body>
+</html>
